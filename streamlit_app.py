@@ -62,6 +62,10 @@ if uploaded_file is not None:
     
     if st.button("➡️ Next (Classify)"):
     with st.spinner("Processing image... 🔍"):
+        # Simulate dummy result
+        st.image(uploaded_file, caption="Uploaded Image", use_container_width=True)
+        st.success("✅ Image processed successfully (dummy prediction).")
+
         try:
             image_array = prepare_image(uploaded_file)
             st.write("✅ Image processed successfully!")
