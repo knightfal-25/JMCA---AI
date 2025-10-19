@@ -21,7 +21,6 @@ st.set_page_config(
 @st.cache_resource
 def load_trained_model():
     try:
-        model = load_model("mobilenetv2_best_tuned.keras")
         st.sidebar.success("✅ Model loaded successfully")
         return model
     except Exception as e:
