@@ -22,6 +22,7 @@ st.set_page_config(
 def load_trained_model():
     try:
         st.info("loading model...")
+        tf.keras.backend.clear_session()
         model = load_model("mobilenetv2_best_tuned.keras", compile=False)
         st.info("✅ Model loaded successfully (reconstructed).")
         st.sidebar.success("✅ Model loaded successfully (reconstructed).")
