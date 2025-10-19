@@ -1,6 +1,5 @@
 import streamlit as st
 import tensorflow as tf
-st.error(tf.__version__)
 import numpy as np
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
@@ -25,7 +24,6 @@ def load_trained_model():
         #st.info("loading model...")
         tf.keras.backend.clear_session()
         model = load_model("mobilenetv2_best_tuned.keras", compile=False)
-        #st.info("✅ Model loaded successfully (reconstructed).")
         st.sidebar.success("✅ Model loaded successfully (reconstructed).")
         return model
 
