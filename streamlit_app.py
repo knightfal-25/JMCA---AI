@@ -64,7 +64,21 @@ if uploaded_file is not None:
         with st.spinner("Processing image... 🔍"):
             # Preprocess and predict
             image_array = prepare_image(uploaded_file)
-            predictions = model.predict(image_array)
+
+            # Check how many inputs the model expects
+            num_inputs = len(model.inputs)
+
+            # Handle single or multiple input models
+            try:
+                if num_inputs > 1:
+                    st.sidebar.write(f"🧩 Model expects {num_inputs} inputs, duplicating image...")
+                    predictions = model.predict([image_array] * num_inputs)
+                else:
+                    predictions = model.predict(image_array)
+            except Exception as e:
+                st.error(f"Error during prediction: {e}")
+                st.stop()
+
             class_idx = np.argmax(predictions)
             confidence = float(predictions[0][class_idx]) * 100
 
@@ -72,6 +86,7 @@ if uploaded_file is not None:
         st.subheader(f"Result: **{class_names[class_idx]}**")
         st.progress(confidence / 100)
         st.caption(f"Confidence: {confidence:.2f}%")
+
 
 else:
     st.info("Please upload an image to start classification.")
