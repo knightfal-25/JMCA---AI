@@ -2,6 +2,7 @@ import streamlit as st
 from PIL import Image
 import tensorflow as tf
 import numpy as np
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 
 # ==============================
 # STREAMLIT CONFIG
@@ -76,10 +77,11 @@ elif st.session_state.page == "result":
             # --- LOAD MODEL ---
             model = tf.keras.models.load_model("mobilenetv2_best_tuned.keras")
 
-            # --- PREPROCESS IMAGE ---
+            # --- PREPROCESS IMAGE (pakai MobileNetV2 preprocessing) ---
             img = image.resize((224, 224))
-            img_array = np.array(img) / 255.0
+            img_array = np.array(img)
             img_array = np.expand_dims(img_array, axis=0)
+            img_array = preprocess_input(img_array)
 
             # --- PREDICT ---
             preds = model.predict(img_array)
