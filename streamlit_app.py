@@ -59,7 +59,7 @@ uploaded_file = st.file_uploader(
 if uploaded_file is not None:
     st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
     
-        if st.button("➡️ Next (Classify)"):
+    if st.button("➡️ Next (Classify)"):
         with st.spinner("Processing image... 🔍"):
             # Preprocess and predict
             image_array = prepare_image(uploaded_file)
@@ -71,6 +71,7 @@ if uploaded_file is not None:
         st.subheader(f"Result: **{class_names[class_idx]}**")
         st.progress(confidence / 100)
         st.caption(f"Confidence: {confidence:.2f}%")
+
 else:
     st.info("Please upload an image to start classification.")
 
