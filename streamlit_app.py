@@ -21,27 +21,28 @@ st.set_page_config(
 @st.cache_resource
 def load_trained_model():
     try:
-        model = load_model("mobilenetv2_best_tuned.keras", compile=False)
+        base_model = load_model("mobilenetv2_best_tuned.keras", compile=False)
 
-        # === Handle multiple input tensors ===
-        from tensorflow.keras import Model
-        if isinstance(model.input, list):
-            st.sidebar.warning(f"⚠️ Model has {len(model.input)} input tensors. Reconnecting only the first one.")
-            # Rebuild model with only the first input connected to the existing output
-            model = Model(inputs=model.input[0], outputs=model.output)
+        import tensorflow as tf
+        from tensorflow.keras import Model, Input
 
-        # === Ensure proper output structure ===
-        if isinstance(model.output, list):
-            model = Model(inputs=model.input, outputs=model.output[0])
+        # Jika model punya 2 input tensor, kita ambil yang pertama saja
+        if isinstance(base_model.input, list):
+            st.sidebar.warning("⚠️ Model has multiple inputs — using only the first input tensor.")
+            first_input = base_model.input[0]
+        else:
+            first_input = base_model.input
 
-        st.sidebar.success("✅ Model loaded successfully")
+        # Buat model baru yang hanya terhubung dari input pertama ke output terakhir
+        new_output = base_model(first_input)
+        model = Model(inputs=first_input, outputs=new_output)
+
+        st.sidebar.success("✅ Model loaded successfully (reconstructed).")
         return model
 
     except Exception as e:
         st.sidebar.error(f"⚠️ Error loading model: {e}")
         st.stop()
-
-
 
 model = load_trained_model()
 class_names = ['Cat', 'Dog']
