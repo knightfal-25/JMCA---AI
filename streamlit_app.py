@@ -1,24 +1,45 @@
 import streamlit as st
-from PIL import Image
-import numpy as np
 import tensorflow as tf
+import numpy as np
+from PIL import Image
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 
-st.title("Animal Classifier - Cat/Dog/Rabbit")
-model = tf.keras.models.load_model("model/best_model.h5")
+# Judul halaman
+st.title("Klasifikasi Gambar Kucing dan Anjing")
+st.write("Aplikasi ini menggunakan model MobileNetV2 yang telah dioptimasi dengan hyperparameter tuning.")
 
-IMG_SIZE = (224,224)
-class_names = ['cat','dog','rabbit']
+# Load model
+@st.cache_resource
+def load_model():
+    model = tf.keras.models.load_model('mobilenetv2_best_tuned.keras')
+    return model
 
-uploaded_file = st.file_uploader("Upload image", type=['jpg','jpeg','png'])
+model = load_model()
+
+# Upload gambar
+uploaded_file = st.file_uploader("Unggah gambar kucing atau anjing", type=["jpg", "jpeg", "png"])
+
 if uploaded_file is not None:
-    img = Image.open(uploaded_file).convert('RGB')
-    st.image(img, caption='Uploaded Image', use_column_width=True)
-    # preprocess
-    img_resized = img.resize(IMG_SIZE)
-    x = np.array(img_resized) / 255.0
-    x = np.expand_dims(x, axis=0)
-    preds = model.predict(x)[0]
-    top_idx = np.argmax(preds)
-    st.write(f"Prediction: **{class_names[top_idx]}** ({preds[top_idx]*100:.2f}%)")
-    st.bar_chart(preds)
+    # Tampilkan gambar
+    image = Image.open(uploaded_file).convert('RGB')
+    st.image(image, caption="Gambar yang diunggah", use_column_width=True)
 
+    # Preprocessing gambar
+    img_resized = image.resize((32, 32))
+    img_array = np.array(img_resized)
+    img_preprocessed = preprocess_input(img_array)
+    img_input = np.expand_dims(img_preprocessed, axis=0)
+
+    # Prediksi
+    prediction = model.predict(img_input)
+    class_idx = np.argmax(prediction, axis=1)[0]
+    labels = ['Cat', 'Dog']
+    result = labels[class_idx]
+    confidence = float(np.max(prediction)) * 100
+
+    # Hasil prediksi
+    st.markdown(f"### Prediksi Model: **{result}**")
+    st.markdown(f"**Tingkat Kepercayaan:** {confidence:.2f}%")
+
+st.write("---")
+st.caption("Dibuat oleh Kelompok IT Works | Tugas AI-TK2")
