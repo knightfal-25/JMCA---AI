@@ -60,11 +60,8 @@ uploaded_file = st.file_uploader(
 if uploaded_file is not None:
     st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
     
-    if st.button("➡️ Next (Classify)"):
-    with st.spinner("Processing image... 🔍"):
-        # Simulate dummy result
-        st.image(uploaded_file, caption="Uploaded Image", use_container_width=True)
-        st.success("✅ Image processed successfully (dummy prediction).")
+   if st.button("➡️ Next (Classify)"):
+    st.info("Feature not implemented yet.")
 
         try:
             image_array = prepare_image(uploaded_file)
