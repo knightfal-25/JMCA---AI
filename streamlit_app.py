@@ -87,4 +87,4 @@ st.sidebar.markdown("""
 """)
 
 st.sidebar.markdown("---")
-st.sidebar.write("👨‍💻 Developed by Satria & Team")
+st.sidebar.write("👨‍💻Developed by Group 1 ")
