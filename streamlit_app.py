@@ -21,22 +21,7 @@ st.set_page_config(
 @st.cache_resource
 def load_trained_model():
     try:
-        base_model = load_model("mobilenetv2_best_tuned.keras", compile=False)
-
-        import tensorflow as tf
-        from tensorflow.keras import Model, Input
-
-        # Jika model punya 2 input tensor, kita ambil yang pertama saja
-        if isinstance(base_model.input, list):
-            st.sidebar.warning("⚠️ Model has multiple inputs — using only the first input tensor.")
-            first_input = base_model.input[0]
-        else:
-            first_input = base_model.input
-
-        # Buat model baru yang hanya terhubung dari input pertama ke output terakhir
-        new_output = base_model(first_input)
-        model = Model(inputs=first_input, outputs=new_output)
-
+        model = load_model("mobilenetv2_best_tuned.keras", compile=False)
         st.sidebar.success("✅ Model loaded successfully (reconstructed).")
         return model
 
