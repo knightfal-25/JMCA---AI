@@ -20,16 +20,15 @@ st.set_page_config(
 # ===========================
 @st.cache_resource
 def load_trained_model():
-    try:
-        model = load_model("mobilenetv2_best_tuned.keras")
-        st.sidebar.success("✅ Model loaded successfully")
-        return model
-    except Exception as e:
-        st.sidebar.error("⚠️ Model not found. Please upload 'mobilenetv2_best_tuned.keras'.")
+    import os
+    model_path = "mobilenetv2_best_tuned.keras"
+    if not os.path.exists(model_path):
+        st.sidebar.error("⚠️ Model file not found. Make sure it's uploaded to the same repo folder.")
         st.stop()
+    model = load_model(model_path)
+    st.sidebar.success("✅ Model loaded successfully")
+    return model
 
-model = load_trained_model()
-class_names = ['Cat', 'Dog']
 
 # ===========================
 #  IMAGE PREPROCESSING
@@ -46,7 +45,7 @@ def prepare_image(uploaded_image):
 # ===========================
 #  UI DESIGN
 # ===========================
-st.title("Cat vs Dog Classifier")
+st.title("🐱🐶 Cat vs Dog Classifier")
 st.markdown("""
 Upload an image below to classify whether it's a **Cat** or **Dog**.
 The model was trained using **MobileNetV2 + Hyperparameter Tuning** on the **CIFAR-10 dataset**.
@@ -88,4 +87,4 @@ st.sidebar.markdown("""
 """)
 
 st.sidebar.markdown("---")
-st.sidebar.write("👨‍💻 Developed by Group 1")
+st.sidebar.write("👨‍💻Developed by Group 1 ")
