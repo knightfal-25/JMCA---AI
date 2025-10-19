@@ -25,7 +25,7 @@ def load_trained_model():
         st.sidebar.success("✅ Model loaded successfully")
         return model
     except Exception as e:
-        st.sidebar.error("⚠️ Model not found. Please upload 'mobilenetv2_best_tuned.keras'.")
+        st.sidebar.error(f"⚠️ Error loading model: {e}")
         st.stop()
 
 model = load_trained_model()
