@@ -61,18 +61,12 @@ if uploaded_file is not None:
     st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
     
    if st.button("➡️ Next (Classify)"):
-    st.info("Feature not implemented yet.")
-
-        try:
-            image_array = prepare_image(uploaded_file)
-            st.write("✅ Image processed successfully!")
-            st.write(f"Image shape: {image_array.shape}")
-
-            predictions = model.predict(image_array)
-            st.write("✅ Prediction executed successfully!")
-
-            class_idx = np.argmax(predictions)
-            confidence = float(predictions[0][class_idx]) * 100
+    with st.spinner("Processing image... 🔍"):
+        # Preprocess and predict
+        image_array = prepare_image(uploaded_file)
+        predictions = model.predict(image_array)
+        class_idx = np.argmax(predictions)
+        confidence = float(predictions[0][class_idx]) * 100
 
             st.success("✅ Prediction Complete!")
             st.subheader(f"Result: **{class_names[class_idx]}**")
