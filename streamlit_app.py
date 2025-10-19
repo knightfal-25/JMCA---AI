@@ -22,18 +22,25 @@ st.set_page_config(
 def load_trained_model():
     try:
         model = load_model("mobilenetv2_best_tuned.keras", compile=False)
-        
-        # --- handle duplicate input issue ---
-        if isinstance(model.input, list) and len(model.input) > 1:
-            st.sidebar.warning(f"⚠️ Model has {len(model.input)} inputs. Using only the first input tensor.")
-            from tensorflow.keras import Model
+
+        # === Handle multiple input tensors ===
+        from tensorflow.keras import Model
+        if isinstance(model.input, list):
+            st.sidebar.warning(f"⚠️ Model has {len(model.input)} input tensors. Reconnecting only the first one.")
+            # Rebuild model with only the first input connected to the existing output
             model = Model(inputs=model.input[0], outputs=model.output)
+
+        # === Ensure proper output structure ===
+        if isinstance(model.output, list):
+            model = Model(inputs=model.input, outputs=model.output[0])
 
         st.sidebar.success("✅ Model loaded successfully")
         return model
+
     except Exception as e:
         st.sidebar.error(f"⚠️ Error loading model: {e}")
         st.stop()
+
 
 
 model = load_trained_model()
