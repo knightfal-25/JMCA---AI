@@ -1,45 +1,94 @@
 import streamlit as st
+from PIL import Image
 import tensorflow as tf
 import numpy as np
-from PIL import Image
-from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 
-# Judul halaman
-st.title("Klasifikasi Gambar Kucing dan Anjing")
-st.write("Aplikasi ini menggunakan model MobileNetV2 yang telah dioptimasi dengan hyperparameter tuning.")
+# ==============================
+# STREAMLIT CONFIG
+# ==============================
+st.set_page_config(
+    page_title="Image Classifier App",
+    page_icon="📸",
+    layout="centered"
+)
 
-# Load model
-@st.cache_resource
-def load_model():
-    model = tf.keras.models.load_model('mobilenetv2_best_tuned.keras')
-    return model
+# ==============================
+# SESSION STATE
+# ==============================
+if "uploaded_image" not in st.session_state:
+    st.session_state.uploaded_image = None
+if "page" not in st.session_state:
+    st.session_state.page = "upload"
 
-model = load_model()
+# ==============================
+# CUSTOM CSS (biar mirip website converter)
+# ==============================
+st.markdown("""
+<style>
+[data-testid="stFileUploader"] {
+    margin-top: 50px;
+    text-align: center;
+}
+button {
+    font-size: 18px !important;
+    padding: 0.75em 2em !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
-# Upload gambar
-uploaded_file = st.file_uploader("Unggah gambar kucing atau anjing", type=["jpg", "jpeg", "png"])
+# ==============================
+# PAGE 1: UPLOAD IMAGE
+# ==============================
+if st.session_state.page == "upload":
+    st.title("📸 Image Classification App")
+    st.subheader("Upload your image below")
 
-if uploaded_file is not None:
-    # Tampilkan gambar
-    image = Image.open(uploaded_file).convert('RGB')
-    st.image(image, caption="Gambar yang diunggah", use_column_width=True)
+    uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
 
-    # Preprocessing gambar
-    img_resized = image.resize((32, 32))
-    img_array = np.array(img_resized)
-    img_preprocessed = preprocess_input(img_array)
-    img_input = np.expand_dims(img_preprocessed, axis=0)
+    if uploaded_file:
+        image = Image.open(uploaded_file)
+        st.image(image, caption="Preview", use_container_width=True)
+        st.session_state.uploaded_image = image
 
-    # Prediksi
-    prediction = model.predict(img_input)
-    class_idx = np.argmax(prediction, axis=1)[0]
-    labels = ['Cat', 'Dog']
-    result = labels[class_idx]
-    confidence = float(np.max(prediction)) * 100
+    if st.button("Next ➡️"):
+        if st.session_state.uploaded_image is not None:
+            st.session_state.page = "result"
+            st.rerun()
+        else:
+            st.warning("Please upload an image first!")
 
-    # Hasil prediksi
-    st.markdown(f"### Prediksi Model: **{result}**")
-    st.markdown(f"**Tingkat Kepercayaan:** {confidence:.2f}%")
+# ==============================
+# PAGE 2: RESULT PAGE
+# ==============================
+elif st.session_state.page == "result":
+    st.title("🧠 Prediction Result")
 
-st.write("---")
-st.caption("Dibuat oleh Kelompok IT Works | Tugas AI-TK2")
+    if st.session_state.uploaded_image is None:
+        st.warning("No image uploaded. Please go back and upload an image.")
+        if st.button("⬅️ Back"):
+            st.session_state.page = "upload"
+            st.rerun()
+    else:
+        image = st.session_state.uploaded_image
+        st.image(image, caption="Your Uploaded Image", use_container_width=True)
+
+        with st.spinner("Processing image..."):
+            # --- LOAD MODEL ---
+            model = tf.keras.models.load_model("mobilenetv2_best_tuned.keras")
+
+            # --- PREPROCESS IMAGE ---
+            img = image.resize((224, 224))
+            img_array = np.array(img) / 255.0
+            img_array = np.expand_dims(img_array, axis=0)
+
+            # --- PREDICT ---
+            preds = model.predict(img_array)
+            class_idx = np.argmax(preds)
+            confidence = np.max(preds) * 100
+
+        st.success(f"✅ Predicted Class: {class_idx}")
+        st.info(f"Confidence: {confidence:.2f}%")
+
+        if st.button("⬅️ Back"):
+            st.session_state.page = "upload"
+            st.rerun()
