@@ -21,7 +21,9 @@ st.set_page_config(
 @st.cache_resource
 def load_trained_model():
     try:
+        st.info("loading model...")
         model = load_model("mobilenetv2_best_tuned.keras", compile=False)
+        st.info("✅ Model loaded successfully (reconstructed).")
         st.sidebar.success("✅ Model loaded successfully (reconstructed).")
         return model
 
