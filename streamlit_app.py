@@ -60,7 +60,7 @@ uploaded_file = st.file_uploader(
 if uploaded_file is not None:
     st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
     
-    iif st.button("➡️ Next (Classify)"):
+    if st.button("➡️ Next (Classify)"):
     with st.spinner("Processing image... 🔍"):
         try:
             image_array = prepare_image(uploaded_file)
