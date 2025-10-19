@@ -20,15 +20,16 @@ st.set_page_config(
 # ===========================
 @st.cache_resource
 def load_trained_model():
-    import os
-    model_path = "mobilenetv2_best_tuned.keras"
-    if not os.path.exists(model_path):
-        st.sidebar.error("⚠️ Model file not found. Make sure it's uploaded to the same repo folder.")
+    try:
+        model = load_model("mobilenetv2_best_tuned.keras")
+        st.sidebar.success("✅ Model loaded successfully")
+        return model
+    except Exception as e:
+        st.sidebar.error("⚠️ Model not found. Please upload 'mobilenetv2_best_tuned.keras'.")
         st.stop()
-    model = load_model(model_path)
-    st.sidebar.success("✅ Model loaded successfully")
-    return model
 
+model = load_trained_model()
+class_names = ['Cat', 'Dog']
 
 # ===========================
 #  IMAGE PREPROCESSING
@@ -59,13 +60,18 @@ uploaded_file = st.file_uploader(
 if uploaded_file is not None:
     st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
     
-   if st.button("➡️ Next (Classify)"):
-    with st.spinner("Processing image... 🔍"):
-        # Preprocess and predict
-        image_array = prepare_image(uploaded_file)
-        predictions = model.predict(image_array)
-        class_idx = np.argmax(predictions)
-        confidence = float(predictions[0][class_idx]) * 100
+    if st.button("➡️ Next (Classify)"):
+        with st.spinner("Processing image... 🔍"):
+            # Preprocess and predict
+            image_array = prepare_image(uploaded_file)
+            predictions = model.predict(image_array)
+            class_idx = np.argmax(predictions)
+            confidence = float(predictions[0][class_idx]) * 100
+
+        st.success("✅ Prediction Complete!")
+        st.subheader(f"Result: **{class_names[class_idx]}**")
+        st.progress(confidence / 100)
+        st.caption(f"Confidence: {confidence:.2f}%")
 
 else:
     st.info("Please upload an image to start classification.")
@@ -76,10 +82,10 @@ else:
 st.sidebar.header("ℹ️ About this App")
 st.sidebar.markdown("""
 **Cat vs Dog Classifier** built with:
-- 🧠 TensorFlow + MobileNetV2 (Transfer Learning)
-- 🎨 Streamlit for interactive web UI
-- 🐾 CIFAR-10 Dataset (Cat & Dog classes only)
+- TensorFlow + MobileNetV2 (Transfer Learning)
+- Streamlit for interactive web UI
+- CIFAR-10 Dataset (Cat & Dog classes only)
 """)
 
 st.sidebar.markdown("---")
-st.sidebar.write("👨‍💻Developed by Group 1 ")
+st.sidebar.write("👨‍💻 Developed by Group 1")
