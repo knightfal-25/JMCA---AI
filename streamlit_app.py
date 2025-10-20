@@ -23,7 +23,7 @@ def load_trained_model():
     try:
         #st.info("loading model...")
         tf.keras.backend.clear_session()
-        model = load_model("mobilenetv2_best_tuned.keras", compile=False)
+        model = load_model("cnn_cat_dog.keras", compile=False)
         st.sidebar.success("✅ Model loaded successfully (reconstructed).")
         return model
 
